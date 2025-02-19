@@ -1,64 +1,53 @@
-version: '3.8'
-
 services:
-  # Laravel
+ # Бэкнд лара
   app:
     build:
-      context: ./backend
+      context: ./app
       dockerfile: Dockerfile
     container_name: laravel_backend
     restart: unless-stopped
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_DATABASE=laravel
+      - DB_DATABASE=pn_db
       - DB_USERNAME=root
       - DB_PASSWORD=secret
     volumes:
-      - ./backend:/var/www/html
+      - ./app/:/var/www
     ports:
-      - "8000:80"
+      - "9000:9000"
     networks:
       - pn-network
     depends_on:
       - mysql
 
-  # MySQL
+  
+
+  # база данных
   mysql:
     image: mysql:8.0
     container_name: mysql
-    restart: unless-stopped
+    restart: always
     environment:
-      MYSQL_DATABASE: laravel
       MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: pn_db
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: secret
     volumes:
       - ./mysql/data:/var/lib/mysql
     ports:
       - "3306:3306"
-    networks:
-      - pn-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
-
-  # Vue.js
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: vue_frontend
-    restart: unless-stopped
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "8080:8080"
     networks:
       - pn-network
-    depends_on:
-      - backend
+  
 
+
+  
+# сеть
 networks:
   pn-network:
     driver: bridge
