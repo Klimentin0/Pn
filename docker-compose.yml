@@ -20,8 +20,22 @@ services:
       - pn-network
     depends_on:
       - mysql
-
-  
+# VUE
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vue_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - pn-network
+    depends_on:
+      - app 
 
   # база данных
   mysql:
